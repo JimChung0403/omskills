@@ -1,0 +1,76 @@
+### FarPoint Spread (AxFPSpread.AxvaSpread)
+ELM 子系大量使用 FarPoint 的 AxFPSpread (ActiveX) 控制項來呈現資料、排序和匯出功能。此元件在 View 資料夾中的超過 20 個表單中都有出現。
+
+**主要整合點：**
+- **宣告方式：** 每個表單的 Designer 檔案都會宣告一個 WithEvents 欄位給 Spread 控制項（例如 spdOrder、spdPrem、spdFoc）
+- **初始化：** 在每個表單的 InitializeComponent 方法中實例化
+- **輔助模組：** 所有共同操作都透過 .vb 處理，提供：
+ * 排序 (spd_Sort)
+  * 欄寬調整 (spdColSize)
+  * 隱藏欄位 (spdHiddenCols)
+  * 匯出至 Excel (SaveToExcel)
+  * 核取方塊點擊處理 (gridOptClick)
+  * 儲存格值讀寫 (spdOut, GetSpdCellData)
+  * 基於 XML 的表格標題設定 (XML_to_Grid_Title)
+
+# 標準 WinForms 控制項
+
+| 控制項 | 宣告範例 | 使用檔案數量 | 用途 |
+|--------|----------|--------------|------|
+| **Button** | `Public WithEvents cmdCommit As System.Windows.Forms.Button` | 22 個檔案 | 觸發動作如 "Commit"、"Exit"、"Get Orders"、"Search"、"Export" |
+| **Label** | `Public WithEvents Label17 As System.Windows.Forms.Label` | 22 個檔案 | 提供欄位、區段或標題的靜態文字標籤 |
+| **TextBox** (標準/自訂) | `Public WithEvents txtOrgLines As com.tsmc.om.common.SecureTextBox` | 22 個檔案 | 用戶可編輯的欄位，用於輸入 ID、XML、備註等 (SecureTextBox 繼承自 TextBox) |
+| **ComboBox** (標準/自訂) | `Public WithEvents cboRunPri As com.tsmc.om.common.SecureComboBox` | 15 個檔案 | 下拉選單選擇 Run Priority、Request Type 等 (SecureComboBox 繼承自 ComboBox) |
+| **CheckBox** | `Public WithEvents chkisleadlot | **RadioButton** | `Public WithEvents optconfYes As System.Windows.Forms.RadioButton` | 8 個檔案 | 互斥選項 (例如確認 Yes/No) |
+As System.Windows.Forms.CheckBox` | 10 個檔案 | 二元選項 (例如 "Lead Lot"、"Enable Auto-Refresh") |
+| **GroupBox** | `Public WithEvents SSFrame1 As System.Windows.Forms.GroupBox` | 18 個檔案 | 視覺上將相關控制項群組化 |
+| **Panel** | `Public WithEvents palRemark As System.Windows.Forms.Panel` | 12 個檔案 | 用於動態版面配置的容器，通常包含其他控制項 |
+| **TabControl** | `Public WithEvents TabControl1 As System.Windows.Forms.TabControl` | 5 個檔案 | 將 UI 組織成分頁頁面 (例如不同報表區段) |
+| **ListView** | `Public WithEvents ListView1 As System.Windows.Forms.ListView` | 7 個檔案 | 顯示帶欄位的列表 (等待工作、查詢結果) |
+| **DataGridView** | `Public WithEvents DataGridView1 As System.Windows.Forms.DataGridView` | 4 個檔案 | 表格式資料輸入/顯示用於訂單、報表等 |
+| **PictureBox** | `Public WithEvents PictureBox1 As System.Windows.Forms.PictureBox` | frmSecurity.Designer.vb | 顯示登入畫面的品牌圖示/logo|
+| **MenuStrip** | `Public WithEvents MainMenu As System.Windows.Forms.MenuStrip` | frmGrade_Main.Designer.vb | 頂層功能表 (File、Edit、Help) |
+| **ToolStrip** | `Public WithEvents ToolStrip1 As System.Windows.Forms.ToolStrip` | | 工具列包含快捷按鈕 (Refresh、Export) |
+| **StatusStrip** | `Public WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip` | .Designer.vb | 顯示狀態訊息和進度 |
+| **ProgressBar** | `Public WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar` | 8 個檔案 | 為長時間執行的操作提供視覺回饋 |
+| **DateTimePicker** | `Public WithEvents dtpStartDate As System.Windows.Forms.DateTimePicker` | 4 個檔案 | 選擇查詢或預訂的日期 |
+| **ListBox** | `Public WithEvents ListBox1 As System.Windows.Forms.ListBox` | 3 個檔案 | 顯示可供選擇的 PC 清單以分配配額 |
+| **RichTextBox** | `Public WithEvents RichTextBox1 As System.Windows.Forms.RichTextBox` | .Designer.vb | 支援格式設定的多行文字輸入框用於備註 |
+| **SplitContainer** | `Public WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer` | .Designer.vb | 將 UI 分割為可調整大小的窗格 (樹狀檢視/詳細資訊) |
+| **TableLayoutPanel** | `Public WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel` | frmRpt_OverRanking.Designer.vb | 以網格方式排列控制項 |
+| **LinkLabel** | `Public WithEvents lnkHelp As System.Windows.Forms.LinkLabel` | frmSecurity.Designer.vb | 可點擊的超連結用於說明/關於 |
+| **NumericUpDown** | `Public WithEvents nudQty As System.Windows.Forms.NumericUpDown` | | 數值輸入控制項帶有微調按鈕用於數量設定 |
+| **Timer** | `Public WithEvents Timer1 As System.Windows.Forms.Timer` |  | 定期更新 UI 或處理逾時 |
+| **FileDialogs** | `Public WithEvents SaveFileDialog1 As System.Windows.Forms.SaveFileDialog` | 5 個檔案 | 匯出報表時的檔案儲存操作 |
+| **PrintDialogs** | `Public WithEvents PrintDialog1 As System.Windows.Forms.PrintDialog` | .Designer.vb | 報表列印支援 |
+| **ToolTip** | `Public ToolTip1 As System.Windows.Forms.ToolTip` | .Designer.vb, frmSecurity..vb | 控制項的懸停說明 |
+| **ErrorProvider** | `Public WithEvents ErrorProvider1 As System.Windows.Forms.ErrorProvider` | .Designer.vb | 在輸入欄位旁顯示驗證錯誤圖示 |
+| **ContextMenuStrip** | `Public WithEvents ContextMenuStrip1 As System.Windows.Forms.ContextMenuStrip` | .Designer.vb | 表格列的右鍵選單 |
+
+## 未使用的標準 WinForms 控制項
+以下標準 WinForms 控制項在ELM 子系統的任何 Designer 檔案中都未被使用：
+- WebBrowser
+- FlowLayoutPanel
+- DomainUpDown
+- VScrollBar/HScrollBar
+- BackgroundWorker
+- NotifyIcon
+- TrackBar
+- MaskedTextBox
+- MonthCalendar
+- PropertyGrid
+- HelpProvider
+- UserControl (作為標準控制項 - 自訂的可能另外存在)
+
+## 自訂控制項
+- **SecureTextBox** - 自訂的安全文字框，在  和其他表單中用於敏感資料輸入
+- **SecureComboBox** - 自訂的安全下拉選單，在整個應用程式中用於選單選擇
+
+
+
+
+
+
+
+
+
